@@ -66,10 +66,10 @@ class CacheStore {
         return fileManager.contents(atPath: path.appendingPathComponent(name).relativePath)
     }
     
-    public func persist(data: Data, name: String) throws {
+    public func persist(data: Cachable) throws {
         guard let path = locationPath() else { return }
         try fileManager.createDirectory(at: path, withIntermediateDirectories: true)
-        fileManager.createFile(atPath: path.appendingPathComponent(name).relativePath, contents: data)
+        fileManager.createFile(atPath: path.appendingPathComponent(data.name).relativePath, contents: data.content)
         try cleanup()
     }
     

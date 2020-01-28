@@ -24,7 +24,7 @@ final class CacheTests: XCTestCase {
     
     
     func testPersistAndLoad() {
-        try? cache.persist(data: data, name: "Test")
+        try? cache.persist(data: CacheData(name: "Test", content: data))
         guard let dataFromCache = try? cache.load(name: "Test") else {
             XCTFail()
             return
@@ -35,11 +35,9 @@ final class CacheTests: XCTestCase {
     }
     
     func testDeleteAll() {
-        try? cache.persist(data: data, name: "Test0")
-        try? cache.persist(data: data, name: "Test1")
-        try? cache.persist(data: data, name: "Test2")
-        try? cache.persist(data: data, name: "Test3")
-        try? cache.persist(data: data, name: "Test4")
+        for i in 0...4 {
+            try? cache.persist(data: CacheData(name: "Test\(i)", content: data))
+        }
         try? cache.deleteAll()
         
         let data = try? cache.load(name: "Test2")
@@ -50,9 +48,9 @@ final class CacheTests: XCTestCase {
     }
     
     func testDeleteSingle() {
-        try? cache.persist(data: data, name: "A")
-        try? cache.persist(data: data, name: "B")
-        try? cache.persist(data: data, name: "C")
+        try? cache.persist(data: CacheData(name: "A", content: data))
+        try? cache.persist(data: CacheData(name: "B", content: data))
+        try? cache.persist(data: CacheData(name: "C", content: data))
         try? cache.delete(name: "B")
         
         var data = try? cache.load(name: "B")
@@ -68,7 +66,7 @@ final class CacheTests: XCTestCase {
     }
     
     func testDuration() {
-        try? shortCache.persist(data: data, name: "Test")
+        try? shortCache.persist(data: CacheData(name: "Test", content: data))
         let _expectation = expectation(description: "Wait cache cleanup")
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
@@ -85,11 +83,9 @@ final class CacheTests: XCTestCase {
     
     func testSize() {
         try? shortCache.deleteAll()
-        try? shortCache.persist(data: data, name: "Test0")
-        try? shortCache.persist(data: data, name: "Test1")
-        try? shortCache.persist(data: data, name: "Test2")
-        try? shortCache.persist(data: data, name: "Test3")
-        try? shortCache.persist(data: data, name: "Test4")
+        for i in 0...4 {
+            try? shortCache.persist(data: CacheData(name: "Test\(i)", content: data))
+        }
         
         var data = try? shortCache.load(name: "Test0")
         XCTAssertEqual(data, nil)
