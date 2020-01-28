@@ -11,6 +11,8 @@ class CacheStore {
     private let diskSetting: DiskSetting
     private let fileManager: FileManager
     
+    private typealias File = (date: Date, size: Int, filePath: String)
+    
     public init(diskSetting: DiskSetting, fileManager: FileManager = FileManager.default) {
         self.diskSetting = diskSetting
         self.fileManager = fileManager
@@ -28,7 +30,7 @@ class CacheStore {
         
         if size() > diskSetting.maxSize.byte() {
             guard let leftPaths = self.paths() else { return }
-            var sorted: [(Date, Int, String)] = []
+            var sorted: [File] = []
             for name in leftPaths {
                 guard let filePath = locationPath()?.appendingPathComponent(name).relativePath else { continue }
                 if let date = try? fileManager.attributesOfItem(atPath: filePath)[FileAttributeKey.creationDate] as? Date,
@@ -37,11 +39,11 @@ class CacheStore {
                 }
             }
             sorted.sort { (lhs, rhs) -> Bool in
-                return lhs.0.timeIntervalSince1970 < rhs.0.timeIntervalSince1970
+                return lhs.date.timeIntervalSince1970 < rhs.date.timeIntervalSince1970
             }
             
             if let oldest = sorted.first {
-                try fileManager.removeItem(atPath: oldest.2)
+                try fileManager.removeItem(atPath: oldest.filePath)
                 try cleanup()
             }
         }
