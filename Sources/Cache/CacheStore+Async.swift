@@ -10,7 +10,6 @@ import Foundation
 extension CacheStore {
     
     typealias Completion = (Result<Void, Error>) -> Void
-    typealias DataCompletion = (Result<Data?, Error>) -> Void
     
     public func cleanup(completion: @escaping Completion) {
         dispatch { [weak self] in
@@ -48,11 +47,11 @@ extension CacheStore {
         }
     }
     
-    public func load(name: String, completion: @escaping DataCompletion) {
+    public func load<T: Cachable>(name: String, type: T.Type, completion: @escaping (Result<T?, Error>) -> Void) {
         dispatch { [weak self] in
             guard let self = self else { return }
             do {
-                let data = try self.load(name: name)
+                let data = try self.load(name: name, type: type)
                 completion(.success(data))
             } catch {
                 completion(.failure(error))
@@ -64,7 +63,7 @@ extension CacheStore {
         dispatch { [weak self] in
             guard let self = self else { return }
             do {
-                try self.persist(data: data)
+                try self.persist(cacheable: data)
                 completion(.success)
             } catch {
                 completion(.failure(error))
@@ -76,7 +75,7 @@ extension CacheStore {
         dispatch { [weak self] in
             guard let self = self else { return }
             do {
-                try self.persist(datas: datas)
+                try self.persist(cachables: datas)
                 completion(.success)
             } catch {
                 completion(.failure(error))

@@ -9,5 +9,7 @@ import Foundation
 
 protocol Cachable {
     var name: String { get }
-    var content: Data? { get }
+    var data: Data? { get }
+    
+    init(name: String, data: Data?)
 }

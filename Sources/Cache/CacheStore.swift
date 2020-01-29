@@ -62,24 +62,25 @@ class CacheStore {
         try fileManager.removeItem(atPath: path.appendingPathComponent(name).relativePath)
     }
     
-    public func load(name: String) throws -> Data? {
+    public func load<T: Cachable>(name: String, type: T.Type) throws -> T? {
         try cleanup()
         guard let path = locationPath() else { return nil }
-        return fileManager.contents(atPath: path.appendingPathComponent(name).relativePath)
+        let data = fileManager.contents(atPath: path.appendingPathComponent(name).relativePath)
+        return T(name: name, data: data)
     }
     
-    public func persist(data: Cachable) throws {
+    public func persist(cacheable: Cachable) throws {
         guard let path = locationPath() else { return }
         try fileManager.createDirectory(at: path, withIntermediateDirectories: true)
-        fileManager.createFile(atPath: path.appendingPathComponent(data.name).relativePath, contents: data.content)
+        fileManager.createFile(atPath: path.appendingPathComponent(cacheable.name).relativePath, contents: cacheable.data)
         try cleanup()
     }
     
-    public func persist(datas: [Cachable]) throws {
+    public func persist(cachables: [Cachable]) throws {
         guard let path = locationPath() else { return }
         try fileManager.createDirectory(at: path, withIntermediateDirectories: true)
-        for data in datas {
-            fileManager.createFile(atPath: path.appendingPathComponent(data.name).relativePath, contents: data.content)
+        for data in cachables {
+            fileManager.createFile(atPath: path.appendingPathComponent(data.name).relativePath, contents: data.data)
         }
         try cleanup()
     }

@@ -27,7 +27,7 @@ final class CacheMeasure: XCTestCase {
     func testMeasureSingle() {
         measure {
             for i in 0..<10 {
-                try? cache.persist(data: CacheData(name: "Test\(i)", content: data))
+                try? cache.persist(cacheable: CacheData(name: "Test\(i)", data: data))
             }
             try? cache.deleteAll()
         }
@@ -36,10 +36,10 @@ final class CacheMeasure: XCTestCase {
     func testMeasureBatch() {
         var datas: [Cachable] = []
         for i in 0..<10 {
-            datas.append(CacheData(name: "Test\(i)", content: data))
+            datas.append(CacheData(name: "Test\(i)", data: data))
         }
         measure {
-            try? cache.persist(datas: datas)
+            try? cache.persist(cachables: datas)
             try? cache.deleteAll()
         }
     }

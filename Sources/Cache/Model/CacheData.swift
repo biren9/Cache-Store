@@ -9,5 +9,5 @@ import Foundation
 
 struct CacheData: Cachable {
     let name: String
-    let content: Data?
+    let data: Data?
 }
