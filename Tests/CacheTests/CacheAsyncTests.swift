@@ -200,7 +200,7 @@ final class CacheAsyncTest: XCTestCase {
             switch result {
             case .success:
                 DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
-                    let data = try? self.shortCache.load(name: "Test", type: CacheData.self)?.data
+                    let data = try? self.shortCache.load(name: "Test", type: CacheData.self).data
                     if data != nil {
                         XCTFail()
                         return

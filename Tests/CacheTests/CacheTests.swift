@@ -25,7 +25,7 @@ final class CacheTests: XCTestCase {
     
     func testPersistAndLoad() {
         try? cache.persist(cacheable: CacheData(name: "Test", data: data))
-        guard let dataFromCache = try? cache.load(name: "Test", type: CacheData.self)?.data else {
+        guard let dataFromCache = try? cache.load(name: "Test", type: CacheData.self).data else {
             XCTFail()
             return
         }
@@ -41,13 +41,13 @@ final class CacheTests: XCTestCase {
         }
         try? cache.persist(cachables: batchData)
         
-        var data = try? cache.load(name: "Batch10", type: CacheData.self)?.data
+        var data = try? cache.load(name: "Batch10", type: CacheData.self).data
         XCTAssertEqual(data, self.data)
         
-        data = try? cache.load(name: "Batch0", type: CacheData.self)?.data
+        data = try? cache.load(name: "Batch0", type: CacheData.self).data
         XCTAssertEqual(data, self.data)
         
-        data = try? cache.load(name: "Batch73", type: CacheData.self)?.data
+        data = try? cache.load(name: "Batch73", type: CacheData.self).data
         XCTAssertEqual(data, self.data)
     }
     
@@ -57,7 +57,7 @@ final class CacheTests: XCTestCase {
         }
         try? cache.deleteAll()
         
-        let data = try? cache.load(name: "Test2", type: CacheData.self)?.data
+        let data = try? cache.load(name: "Test2", type: CacheData.self).data
         if data != nil {
             XCTFail()
             return
@@ -70,15 +70,15 @@ final class CacheTests: XCTestCase {
         try? cache.persist(cacheable: CacheData(name: "C", data: data))
         try? cache.delete(name: "B")
         
-        var data = try? cache.load(name: "B", type: CacheData.self)?.data
+        var data = try? cache.load(name: "B", type: CacheData.self).data
         if data != nil {
             XCTFail()
             return
         }
         
-        data = try? cache.load(name: "A", type: CacheData.self)?.data
+        data = try? cache.load(name: "A", type: CacheData.self).data
         XCTAssertEqual(data, self.data)
-        data = try? cache.load(name: "C", type: CacheData.self)?.data
+        data = try? cache.load(name: "C", type: CacheData.self).data
         XCTAssertEqual(data, self.data)
     }
     
@@ -87,7 +87,7 @@ final class CacheTests: XCTestCase {
         let _expectation = expectation(description: "Wait cache cleanup")
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
-            let data = try? self.shortCache.load(name: "Test", type: CacheData.self)?.data
+            let data = try? self.shortCache.load(name: "Test", type: CacheData.self).data
             if data != nil {
                 XCTFail()
                 return
@@ -104,16 +104,16 @@ final class CacheTests: XCTestCase {
             try? shortCache.persist(cacheable: CacheData(name: "Test\(i)", data: data))
         }
         
-        var data = try? shortCache.load(name: "Test0", type: CacheData.self)?.data
+        var data = try? shortCache.load(name: "Test0", type: CacheData.self).data
         XCTAssertEqual(data, nil)
         
-        data = try? shortCache.load(name: "Test1", type: CacheData.self)?.data
+        data = try? shortCache.load(name: "Test1", type: CacheData.self).data
         XCTAssertEqual(data, self.data)
-        data = try? shortCache.load(name: "Test2", type: CacheData.self)?.data
+        data = try? shortCache.load(name: "Test2", type: CacheData.self).data
         XCTAssertEqual(data, self.data)
-        data = try? shortCache.load(name: "Test3", type: CacheData.self)?.data
+        data = try? shortCache.load(name: "Test3", type: CacheData.self).data
         XCTAssertEqual(data, self.data)
-        data = try? shortCache.load(name: "Test4", type: CacheData.self)?.data
+        data = try? shortCache.load(name: "Test4", type: CacheData.self).data
         XCTAssertEqual(data, self.data)
     }
 }

@@ -21,17 +21,19 @@ class CacheStore {
     }
     
     public func cleanup() throws {
-        guard let paths = paths() else { return }
+        let paths = try self.paths() ?? []
         for name in paths {
-            guard let filePath = locationPath()?.appendingPathComponent(name).relativePath else { continue }
-            guard let date = try? fileManager.attributesOfItem(atPath: filePath)[FileAttributeKey.creationDate] as? Date else { continue }
+            guard let filePath = locationPath()?.appendingPathComponent(name).relativePath else {
+                throw CacheError.invalidFilePath
+            }
+            guard let date = try fileManager.attributesOfItem(atPath: filePath)[FileAttributeKey.creationDate] as? Date else { continue }
             if Date().timeIntervalSince(date) > diskSetting.storeDuration.timeInterval() {
                 try fileManager.removeItem(atPath: filePath)
             }
         }
         
         if size() > diskSetting.maxSize.byte() {
-            guard let leftPaths = self.paths() else { return }
+            let leftPaths = try self.paths() ?? []
             var sorted: [File] = []
             for name in leftPaths {
                 guard let filePath = locationPath()?.appendingPathComponent(name).relativePath else { continue }
@@ -52,32 +54,36 @@ class CacheStore {
     }
     
     public func deleteAll() throws {
-        guard let path = locationPath() else { return }
+        guard let path = locationPath() else { throw CacheError.invalidFilePath }
         try fileManager.removeItem(atPath: path.relativePath)
     }
     
     public func delete(name: String) throws {
         try cleanup()
-        guard let path = locationPath() else { return }
+        guard let path = locationPath() else { throw CacheError.invalidFilePath }
         try fileManager.removeItem(atPath: path.appendingPathComponent(name).relativePath)
     }
     
-    public func load<T: Cachable>(name: String, type: T.Type) throws -> T? {
+    public func load<T: Cachable>(name: String, type: T.Type) throws -> T {
         try cleanup()
-        guard let path = locationPath() else { return nil }
+        guard let path = locationPath() else { throw CacheError.invalidFilePath }
         let data = fileManager.contents(atPath: path.appendingPathComponent(name).relativePath)
         return T(name: name, data: data)
     }
     
     public func persist(cacheable: Cachable) throws {
-        guard let path = locationPath() else { return }
+        if cacheable.data?.count ?? 0 > diskSetting.maxSize.byte() {
+            throw CacheError.fileSizeLargerThanAllowed
+        }
+        
+        guard let path = locationPath() else { throw CacheError.invalidFilePath }
         try fileManager.createDirectory(at: path, withIntermediateDirectories: true)
         fileManager.createFile(atPath: path.appendingPathComponent(cacheable.name).relativePath, contents: cacheable.data)
         try cleanup()
     }
     
     public func persist(cachables: [Cachable]) throws {
-        guard let path = locationPath() else { return }
+        guard let path = locationPath() else { throw CacheError.invalidFilePath }
         try fileManager.createDirectory(at: path, withIntermediateDirectories: true)
         for data in cachables {
             fileManager.createFile(atPath: path.appendingPathComponent(data.name).relativePath, contents: data.data)
@@ -87,13 +93,13 @@ class CacheStore {
     
     // MARK: Private 
     
-    private func paths() -> [String]? {
-        guard let path = locationPath() else { return nil }
+    private func paths() throws -> [String]? {
+        guard let path = locationPath() else { throw CacheError.invalidFilePath }
         return fileManager.subpaths(atPath: path.relativePath)
     }
     
     private func size() -> Int {
-        guard let paths = paths() else { return 0 }
+        guard let paths = try? paths() else { return 0 }
         var size = 0
         for name in paths {
             guard let filePath = locationPath()?.appendingPathComponent(name).relativePath else { continue }
