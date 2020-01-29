@@ -10,12 +10,14 @@ import Foundation
 class CacheStore {
     private let diskSetting: DiskSetting
     private let fileManager: FileManager
+    let asyncQueue: DispatchQueue
     
     private typealias File = (date: Date, size: Int, filePath: String)
     
-    public init(diskSetting: DiskSetting, fileManager: FileManager = FileManager.default) {
+    public init(diskSetting: DiskSetting, fileManager: FileManager = FileManager.default, asyncQueue: DispatchQueue = .global(qos: .utility)) {
         self.diskSetting = diskSetting
         self.fileManager = fileManager
+        self.asyncQueue = asyncQueue
     }
     
     public func cleanup() throws {
@@ -70,6 +72,15 @@ class CacheStore {
         guard let path = locationPath() else { return }
         try fileManager.createDirectory(at: path, withIntermediateDirectories: true)
         fileManager.createFile(atPath: path.appendingPathComponent(data.name).relativePath, contents: data.content)
+        try cleanup()
+    }
+    
+    public func persist(datas: [Cachable]) throws {
+        guard let path = locationPath() else { return }
+        try fileManager.createDirectory(at: path, withIntermediateDirectories: true)
+        for data in datas {
+            fileManager.createFile(atPath: path.appendingPathComponent(data.name).relativePath, contents: data.content)
+        }
         try cleanup()
     }
     

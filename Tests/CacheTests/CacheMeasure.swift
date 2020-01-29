@@ -24,11 +24,22 @@ final class CacheMeasure: XCTestCase {
         try? cache.deleteAll()
     }
     
-    func testMeasure() {
+    func testMeasureSingle() {
         measure {
             for i in 0..<10 {
                 try? cache.persist(data: CacheData(name: "Test\(i)", content: data))
             }
+            try? cache.deleteAll()
+        }
+    }
+    
+    func testMeasureBatch() {
+        var datas: [Cachable] = []
+        for i in 0..<10 {
+            datas.append(CacheData(name: "Test\(i)", content: data))
+        }
+        measure {
+            try? cache.persist(datas: datas)
             try? cache.deleteAll()
         }
     }

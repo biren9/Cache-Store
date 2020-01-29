@@ -34,6 +34,23 @@ final class CacheTests: XCTestCase {
         XCTAssertEqual(message, "Hello World")
     }
     
+    func testPersistMultiple() {
+        var batchData: [Cachable] = []
+        for i in 0...100 {
+            batchData.append(CacheData(name: "Batch\(i)", content: data))
+        }
+        try? cache.persist(datas: batchData)
+        
+        var data = try? cache.load(name: "Batch10")
+        XCTAssertEqual(data, self.data)
+        
+        data = try? cache.load(name: "Batch0")
+        XCTAssertEqual(data, self.data)
+        
+        data = try? cache.load(name: "Batch73")
+        XCTAssertEqual(data, self.data)
+    }
+    
     func testDeleteAll() {
         for i in 0...4 {
             try? cache.persist(data: CacheData(name: "Test\(i)", content: data))
