@@ -26,8 +26,6 @@ class CacheImageTests: XCTestCase {
             return nil
         }
         return image
-        #else
-        return nil
         #endif
     }
     

@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol Cachable {
+public protocol Cachable {
     var name: String { get }
     var data: Data? { get }
     
