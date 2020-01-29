@@ -59,11 +59,11 @@ extension CacheStore {
         }
     }
     
-    public func persist(data: Cachable, completion: @escaping Completion) {
+    public func persist(cachable: Cachable, completion: @escaping Completion) {
         dispatch { [weak self] in
             guard let self = self else { return }
             do {
-                try self.persist(cacheable: data)
+                try self.persist(cachable: cachable)
                 completion(.success)
             } catch {
                 completion(.failure(error))
@@ -71,11 +71,11 @@ extension CacheStore {
         }
     }
     
-    public func persist(datas: [Cachable], completion: @escaping Completion) {
+    public func persist(cachables: [Cachable], completion: @escaping Completion) {
         dispatch { [weak self] in
             guard let self = self else { return }
             do {
-                try self.persist(cachables: datas)
+                try self.persist(cachables: cachables)
                 completion(.success)
             } catch {
                 completion(.failure(error))

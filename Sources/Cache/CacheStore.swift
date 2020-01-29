@@ -71,14 +71,14 @@ class CacheStore {
         return T(name: name, data: data)
     }
     
-    public func persist(cacheable: Cachable) throws {
-        if cacheable.data?.count ?? 0 > diskSetting.maxSize.byte() {
+    public func persist(cachable: Cachable) throws {
+        if cachable.data?.count ?? 0 > diskSetting.maxSize.byte() {
             throw CacheError.fileSizeLargerThanAllowed
         }
         
         guard let path = locationPath() else { throw CacheError.invalidFilePath }
         try fileManager.createDirectory(at: path, withIntermediateDirectories: true)
-        fileManager.createFile(atPath: path.appendingPathComponent(cacheable.name).relativePath, contents: cacheable.data)
+        fileManager.createFile(atPath: path.appendingPathComponent(cachable.name).relativePath, contents: cachable.data)
         try cleanup()
     }
     

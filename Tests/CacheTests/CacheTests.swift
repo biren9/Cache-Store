@@ -24,7 +24,7 @@ final class CacheTests: XCTestCase {
     
     
     func testPersistAndLoad() {
-        try? cache.persist(cacheable: CacheData(name: "Test", data: data))
+        try? cache.persist(cachable: CacheData(name: "Test", data: data))
         guard let dataFromCache = try? cache.load(name: "Test", type: CacheData.self).data else {
             XCTFail()
             return
@@ -53,7 +53,7 @@ final class CacheTests: XCTestCase {
     
     func testDeleteAll() {
         for i in 0...4 {
-            try? cache.persist(cacheable: CacheData(name: "Test\(i)", data: data))
+            try? cache.persist(cachable: CacheData(name: "Test\(i)", data: data))
         }
         try? cache.deleteAll()
         
@@ -65,9 +65,9 @@ final class CacheTests: XCTestCase {
     }
     
     func testDeleteSingle() {
-        try? cache.persist(cacheable: CacheData(name: "A", data: data))
-        try? cache.persist(cacheable: CacheData(name: "B", data: data))
-        try? cache.persist(cacheable: CacheData(name: "C", data: data))
+        try? cache.persist(cachable: CacheData(name: "A", data: data))
+        try? cache.persist(cachable: CacheData(name: "B", data: data))
+        try? cache.persist(cachable: CacheData(name: "C", data: data))
         try? cache.delete(name: "B")
         
         var data = try? cache.load(name: "B", type: CacheData.self).data
@@ -83,7 +83,7 @@ final class CacheTests: XCTestCase {
     }
     
     func testDuration() {
-        try? shortCache.persist(cacheable: CacheData(name: "Test", data: data))
+        try? shortCache.persist(cachable: CacheData(name: "Test", data: data))
         let _expectation = expectation(description: "Wait cache cleanup")
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
@@ -101,7 +101,7 @@ final class CacheTests: XCTestCase {
     func testSize() {
         try? shortCache.deleteAll()
         for i in 0...4 {
-            try? shortCache.persist(cacheable: CacheData(name: "Test\(i)", data: data))
+            try? shortCache.persist(cachable: CacheData(name: "Test\(i)", data: data))
         }
         
         var data = try? shortCache.load(name: "Test0", type: CacheData.self).data

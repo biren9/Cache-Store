@@ -27,7 +27,7 @@ final class CacheMeasure: XCTestCase {
     func testMeasureSingle() {
         measure {
             for i in 0..<10 {
-                try? cache.persist(cacheable: CacheData(name: "Test\(i)", data: data))
+                try? cache.persist(cachable: CacheData(name: "Test\(i)", data: data))
             }
             try? cache.deleteAll()
         }

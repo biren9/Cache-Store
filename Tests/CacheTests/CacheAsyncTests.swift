@@ -32,7 +32,7 @@ final class CacheAsyncTest: XCTestCase {
     
     func testPersistAndLoadAsync() {
         var exp = expectation(description: "testPersistAndLoad")
-        cache.persist(data: CacheData(name: "Test", data: data), completion: { result in
+        cache.persist(cachable: CacheData(name: "Test", data: data), completion: { result in
             switch result {
             case .success:
                 exp.fulfill()
@@ -72,7 +72,7 @@ final class CacheAsyncTest: XCTestCase {
         }
         
         let exp = expectation(description: "testPersistMultipleAsync")
-        cache.persist(datas: batchData, completion: { result in
+        cache.persist(cachables: batchData, completion: { result in
             switch result {
             case .success:
                 self.cache.load(name: "Batch10", type: CacheData.self, completion: { result in
@@ -96,7 +96,7 @@ final class CacheAsyncTest: XCTestCase {
     
     func testDeleteAllAsync() {
         for i in 0...4 {
-            try? cache.persist(cacheable: CacheData(name: "Test\(i)", data: data))
+            try? cache.persist(cachable: CacheData(name: "Test\(i)", data: data))
         }
         let exp = expectation(description: "testDeleteAllAsync")
         cache.deleteAll(completion: { result in
@@ -131,7 +131,7 @@ final class CacheAsyncTest: XCTestCase {
                      CacheData(name: "C", data: data)]
         
         let exp = expectation(description: "testDeleteSingle")
-        cache.persist(datas: datas, completion: { result in
+        cache.persist(cachables: datas, completion: { result in
             switch result {
             case .success:
                 self.cache.delete(name: "B", completion: { result in
@@ -196,7 +196,7 @@ final class CacheAsyncTest: XCTestCase {
     
     func testDurationAsync() {
         let exp = expectation(description: "Wait cache cleanup")
-        shortCache.persist(data: CacheData(name: "Test", data: data), completion: { result in
+        shortCache.persist(cachable: CacheData(name: "Test", data: data), completion: { result in
             switch result {
             case .success:
                 DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
@@ -225,7 +225,7 @@ final class CacheAsyncTest: XCTestCase {
                      CacheData(name: "Test4", data: data)]
         
         shortCache.deleteAll(completion: { _ in
-            self.shortCache.persist(datas: datas, completion: { result in
+            self.shortCache.persist(cachables: datas, completion: { result in
                 switch result {
                 case .success:
                     exp.fulfill()
