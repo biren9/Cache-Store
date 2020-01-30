@@ -121,7 +121,7 @@ public class CacheStore {
         
         guard let path = locationPath() else { throw CacheError.invalidFilePath }
         try fileManager.createDirectory(at: path, withIntermediateDirectories: true)
-        fileManager.createFile(atPath: path.appendingPathComponent(cachable.name).relativePath, contents: cachable.data, attributes: [FileAttributeKey.creationDate: Date()])
+        fileManager.createFile(atPath: path.appendingPathComponent(cachable.name).relativePath, contents: cachable.data, attributes: [.creationDate: Date()])
     }
     
     private func locationPath() -> URL? {
