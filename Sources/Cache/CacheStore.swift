@@ -95,7 +95,7 @@ public class CacheStore {
         try cleanup()
         guard let path = locationPath()?.appendingPathComponent(name).relativePath else { throw CacheError.invalidFilePath }
         let infos = try fileManager.attributesOfItem(atPath: path)
-        let size = (infos[FileAttributeKey.size] as? NSNumber)?.intValue ?? 0
+        let size = (infos[FileAttributeKey.size] as? NSNumber)?.intValue ?? -1
         let creationDate = (infos[FileAttributeKey.creationDate] as? Date) ?? Date(timeIntervalSince1970: 0)
         let modifiedDate = (infos[FileAttributeKey.modificationDate] as? Date) ?? Date(timeIntervalSince1970: 0)
         return FileInformation(size: size,

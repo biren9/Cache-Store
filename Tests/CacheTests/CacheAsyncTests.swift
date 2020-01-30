@@ -312,8 +312,8 @@ final class CacheAsyncTests: XCTestCase {
                 let dateAfter = Date()
                 
                 XCTAssertEqual(infos.size, 11)
-                XCTAssert(infos.creationDate >= dateBefore && infos.creationDate <= dateAfter, "Date before: \(dateBefore) - Date create: \(infos.creationDate) - Date after: \(dateAfter)")
-                XCTAssert(infos.modifiedDate >= dateBefore && infos.modifiedDate <= dateAfter, "Date before: \(dateBefore) - Date modified: \(infos.modifiedDate) - Date after: \(dateAfter)")
+                XCTAssertTrue(infos.creationDate >= dateBefore && infos.creationDate <= dateAfter, "Date before: \(dateBefore) - Date create: \(infos.creationDate) - Date after: \(dateAfter)")
+                XCTAssertTrue(infos.modifiedDate >= dateBefore && infos.modifiedDate <= dateAfter, "Date before: \(dateBefore) - Date modified: \(infos.modifiedDate) - Date after: \(dateAfter)")
                 exp.fulfill()
             case .failure(let error):
                 XCTFail("testInfoAsync: failed! Error: \(error)")

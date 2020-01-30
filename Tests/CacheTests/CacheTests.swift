@@ -124,8 +124,8 @@ final class CacheTests: XCTestCase {
         let dateAfter = Date()
         
         XCTAssertEqual(infos?.size, 11)
-        XCTAssert(infos!.creationDate >= dateBefore && infos!.creationDate <= dateAfter)
-        XCTAssert(infos!.modifiedDate >= dateBefore && infos!.modifiedDate <= dateAfter)
+        XCTAssertTrue(infos!.creationDate >= dateBefore && infos!.creationDate <= dateAfter)
+        XCTAssertTrue(infos!.modifiedDate >= dateBefore && infos!.modifiedDate <= dateAfter)
     }
     
     static var allTests = [
