@@ -323,4 +323,13 @@ final class CacheAsyncTests: XCTestCase {
         wait(for: [exp], timeout: 2)
     }
     
+    static var allTests = [
+        ("testInfoAsync", testInfoAsync),
+        ("testSizeAsync", testSizeAsync),
+        ("testDurationAsync", testDurationAsync),
+        ("testDeleteSingleAsync", testDeleteSingleAsync),
+        ("testDeleteAllAsync", testDeleteAllAsync),
+        ("testPersistMultipleAsync", testPersistMultipleAsync),
+        ("testPersistAndLoadAsync", testPersistAndLoadAsync)
+    ]
 }

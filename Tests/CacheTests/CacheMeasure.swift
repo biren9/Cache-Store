@@ -43,4 +43,9 @@ final class CacheMeasure: XCTestCase {
             try? cache.deleteAll()
         }
     }
+    
+    static var allTests = [
+        ("testMeasureSingle", testMeasureSingle),
+        ("testMeasureBatch", testMeasureBatch)
+    ]
 }

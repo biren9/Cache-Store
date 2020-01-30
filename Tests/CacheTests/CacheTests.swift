@@ -127,4 +127,14 @@ final class CacheTests: XCTestCase {
         XCTAssert(infos!.creationDate >= dateBefore && infos!.creationDate <= dateAfter)
         XCTAssert(infos!.modifiedDate >= dateBefore && infos!.modifiedDate <= dateAfter)
     }
+    
+    static var allTests = [
+        ("testInfo", testInfo),
+        ("testSize", testSize),
+        ("testDuration", testDuration),
+        ("testDeleteSingle", testDeleteSingle),
+        ("testDeleteAll", testDeleteAll),
+        ("testPersistMultiple", testPersistMultiple),
+        ("testPersistAndLoad", testPersistAndLoad)
+    ]
 }
