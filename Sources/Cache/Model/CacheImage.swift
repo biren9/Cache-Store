@@ -11,19 +11,19 @@ import Foundation
 #if canImport(UIKit)
 import UIKit
 
-struct CacheImage: Cachable {
+public struct CacheImage: Cachable {
     public let name: String
     public let image: UIImage?
     var data: Data? {
         return image?.pngData()
     }
     
-    init(name: String, image: UIImage) {
+    public init(name: String, image: UIImage) {
         self.name = name
         self.image = image
     }
     
-    init(name: String, data: Data?) {
+    public init(name: String, data: Data?) {
         self.name = name
         if let data = data {
             image = UIImage(data: data)
@@ -45,12 +45,12 @@ struct CacheImage: Cachable {
         image?.pngData()
     }
     
-    init(name: String, image: NSImage) {
+    public init(name: String, image: NSImage) {
         self.name = name
         self.image = image
     }
     
-    init(name: String, data: Data?) {
+    public init(name: String, data: Data?) {
         self.name = name
         if let data = data {
             image = NSImage(data: data)

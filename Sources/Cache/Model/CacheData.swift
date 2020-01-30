@@ -7,7 +7,12 @@
 
 import Foundation
 
-struct CacheData: Cachable {
+public struct CacheData: Cachable {
     let name: String
     let data: Data?
+    
+    public  init(name: String, data: Data?) {
+        self.name = name
+        self.data = data
+    }
 }
