@@ -116,4 +116,15 @@ final class CacheTests: XCTestCase {
         data = try? shortCache.load(name: "Test4", type: CacheData.self).data
         XCTAssertEqual(data, self.data)
     }
+    
+    func testInfo() {
+        let dateBefore = Date()
+        try? cache.persist(cachable: CacheData(name: "TestSize", data: data))
+        let infos = try? cache.info(name: "TestSize")
+        let dateAfter = Date()
+        
+        XCTAssertEqual(infos?.size, 11)
+        XCTAssert(infos!.creationDate >= dateBefore && infos!.creationDate <= dateAfter)
+        XCTAssert(infos!.modifiedDate >= dateBefore && infos!.modifiedDate <= dateAfter)
+    }
 }
