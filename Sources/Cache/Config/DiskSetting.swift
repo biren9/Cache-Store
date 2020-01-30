@@ -24,8 +24,11 @@ public struct DiskSetting {
 extension DiskSetting {
     public enum Location {
         case cache
-        case secureContainer(String)
         case custom(URL)
+        
+        #if !os(Linux)
+        case secureContainer(String)
+        #endif
     }
     
     public enum Duration {

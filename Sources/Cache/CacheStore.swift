@@ -126,10 +126,13 @@ public class CacheStore {
         switch diskSetting.location {
         case .cache:
             return fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first?.appendingPathComponent(diskSetting.identifier)
-        case .secureContainer(let securityApplicationGroupIdentifier):
-            return fileManager.containerURL(forSecurityApplicationGroupIdentifier: securityApplicationGroupIdentifier)?.appendingPathComponent(diskSetting.identifier)
         case .custom(let url):
             return url
+            
+        #if !os(Linux)
+        case .secureContainer(let securityApplicationGroupIdentifier):
+            return fileManager.containerURL(forSecurityApplicationGroupIdentifier: securityApplicationGroupIdentifier)?.appendingPathComponent(diskSetting.identifier)
+        #endif
         }
     }
 }
