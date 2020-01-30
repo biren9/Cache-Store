@@ -7,7 +7,7 @@
 
 import Foundation
 
-class CacheStore {
+public class CacheStore {
     private let diskSetting: DiskSetting
     private let fileManager: FileManager
     let asyncQueue: DispatchQueue
