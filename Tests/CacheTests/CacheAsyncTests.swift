@@ -302,4 +302,25 @@ final class CacheAsyncTest: XCTestCase {
         wait(for: [exp0, exp1, exp2, exp3, exp4], timeout: 2)
     }
     
+    func testInfoAsync() {
+        let exp = expectation(description: "testInfoAsync")
+        let dateBefore = Date()
+        try? cache.persist(cachable: CacheData(name: "TestSize", data: data))
+        cache.info(name: "TestSize", completion: { result in
+            switch result {
+            case .success(let infos):
+                let dateAfter = Date()
+                
+                XCTAssertEqual(infos.size, 11)
+                XCTAssert(infos.creationDate >= dateBefore && infos.creationDate <= dateAfter)
+                XCTAssert(infos.modifiedDate >= dateBefore && infos.modifiedDate <= dateAfter)
+                exp.fulfill()
+            case .failure:
+                XCTFail()
+                return
+            }
+        })
+        wait(for: [exp], timeout: 2)
+    }
+    
 }

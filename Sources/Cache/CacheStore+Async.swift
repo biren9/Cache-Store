@@ -83,6 +83,20 @@ extension CacheStore {
         }
     }
     
+    public func info(name: String, completion: @escaping (Result<FileInformation, Error>) -> Void) {
+        dispatch { [weak self] in
+            guard let self = self else { return }
+            do {
+                let info = try self.info(name: name)
+                completion(.success(info))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    // MARK: Private
+    
     private func dispatch(_ block: @escaping () -> Void) {
         asyncQueue.async {
             block()
