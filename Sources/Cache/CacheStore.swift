@@ -72,21 +72,13 @@ public class CacheStore {
     }
     
     public func persist(cachable: Cachable) throws {
-        if cachable.data?.count ?? 0 > diskSetting.maxSize.byte() {
-            throw CacheError.fileSizeLargerThanAllowed
-        }
-        
-        guard let path = locationPath() else { throw CacheError.invalidFilePath }
-        try fileManager.createDirectory(at: path, withIntermediateDirectories: true)
-        fileManager.createFile(atPath: path.appendingPathComponent(cachable.name).relativePath, contents: cachable.data)
+        try persistWithoutClean(cachable: cachable)
         try cleanup()
     }
     
     public func persist(cachables: [Cachable]) throws {
-        guard let path = locationPath() else { throw CacheError.invalidFilePath }
-        try fileManager.createDirectory(at: path, withIntermediateDirectories: true)
-        for data in cachables {
-            fileManager.createFile(atPath: path.appendingPathComponent(data.name).relativePath, contents: data.data)
+        for cachable in cachables {
+            try persistWithoutClean(cachable: cachable)
         }
         try cleanup()
     }
@@ -120,6 +112,16 @@ public class CacheStore {
             }
         }
         return size
+    }
+    
+    private func persistWithoutClean(cachable: Cachable) throws {
+        if cachable.data?.count ?? 0 > diskSetting.maxSize.byte() {
+            throw CacheError.fileSizeLargerThanAllowed
+        }
+        
+        guard let path = locationPath() else { throw CacheError.invalidFilePath }
+        try fileManager.createDirectory(at: path, withIntermediateDirectories: true)
+        fileManager.createFile(atPath: path.appendingPathComponent(cachable.name).relativePath, contents: cachable.data)
     }
     
     private func locationPath() -> URL? {

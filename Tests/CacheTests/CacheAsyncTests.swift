@@ -10,14 +10,15 @@ import XCTest
 
 final class CacheAsyncTests: XCTestCase {
     
-    private lazy var disk = DiskSetting(location: .cache, identifier: "json", storeDuration: .minutes(10), maxSize: .KB(10))
-    private lazy var shortDisk = DiskSetting(location: .cache, identifier: "jsonShort", storeDuration: .seconds(5), maxSize: .B(50))
+    private lazy var disk = DiskSetting(location: .cache, identifier: "jsonAsync", storeDuration: .minutes(10), maxSize: .KB(10))
+    private lazy var shortDisk = DiskSetting(location: .cache, identifier: "jsonShortAsync", storeDuration: .seconds(5), maxSize: .B(230))
     private lazy var cache = CacheStore(diskSetting: disk)
     private lazy var shortCache = CacheStore(diskSetting: shortDisk)
-    private let str = "Hello World"
-    private lazy var data: Data = {
-        return str.data(using: .utf8)!
-    }()
+    private var str: String { "Hello World \(UUID().uuidString)" }
+    private var content: (string: String, data: Data) {
+        let string = str
+        return (string, string.data(using: .utf8)!)
+    }
     
     override func setUp() {
         try? cache.deleteAll()
@@ -31,8 +32,9 @@ final class CacheAsyncTests: XCTestCase {
     
     
     func testPersistAndLoadAsync() {
+        let content = self.content
         var exp = expectation(description: "testPersistAndLoad")
-        cache.persist(cachable: CacheData(name: "Test", data: data), completion: { result in
+        cache.persist(cachable: CacheData(name: "Test", data: content.data), completion: { result in
             switch result {
             case .success:
                 exp.fulfill()
@@ -53,7 +55,7 @@ final class CacheAsyncTests: XCTestCase {
                     return
                 }
                 let message = String(data: dataFromCache, encoding: .utf8)
-                XCTAssertEqual(message, "Hello World", "testPersistAndLoadAsync: failed! \(message ?? "nil") != Hello World")
+                XCTAssertEqual(message, content.string, "testPersistAndLoadAsync: failed! \(message ?? "nil") != \(content.string)")
                 exp.fulfill()
             case .failure(let error):
                 XCTFail("testPersistAndLoadAsync: failed! Error: \(error)")
@@ -68,7 +70,7 @@ final class CacheAsyncTests: XCTestCase {
     func testPersistMultipleAsync() {
         var batchData: [Cachable] = []
         for i in 0...100 {
-            batchData.append(CacheData(name: "Batch\(i)", data: data))
+            batchData.append(CacheData(name: "Batch\(i)", data: content.data))
         }
         
         let exp = expectation(description: "testPersistMultipleAsync")
@@ -78,7 +80,7 @@ final class CacheAsyncTests: XCTestCase {
                 self.cache.load(name: "Batch10", type: CacheData.self, completion: { result in
                     switch result {
                     case .success(let data):
-                        XCTAssertEqual(data?.data, self.data, "\(String(describing: data?.data)) != \(self.data)")
+                        XCTAssertEqual(data?.data, batchData[10].data, "\(String(describing: data?.data)) != \(String(describing: batchData[11].data))")
                         exp.fulfill()
                     case .failure(let error):
                         XCTFail("testPersistMultipleAsync: failed! Error: \(error)")
@@ -96,7 +98,7 @@ final class CacheAsyncTests: XCTestCase {
     
     func testDeleteAllAsync() {
         for i in 0...4 {
-            try? cache.persist(cachable: CacheData(name: "Test\(i)", data: data))
+            try? cache.persist(cachable: CacheData(name: "Test\(i)", data: content.data))
         }
         let exp = expectation(description: "testDeleteAllAsync")
         cache.deleteAll(completion: { result in
@@ -126,9 +128,9 @@ final class CacheAsyncTests: XCTestCase {
     }
     
     func testDeleteSingleAsync() {
-        let datas = [CacheData(name: "A", data: data),
-                     CacheData(name: "B", data: data),
-                     CacheData(name: "C", data: data)]
+        let datas = [CacheData(name: "A", data: content.data),
+                     CacheData(name: "B", data: content.data),
+                     CacheData(name: "C", data: content.data)]
         
         let exp = expectation(description: "testDeleteSingle")
         cache.persist(cachables: datas, completion: { result in
@@ -158,7 +160,7 @@ final class CacheAsyncTests: XCTestCase {
         cache.load(name: "A", type: CacheData.self, completion: { result in
             switch result {
             case .success(let data):
-                XCTAssertEqual(data?.data, self.data, "\(String(describing: data?.data)) != \(self.data)")
+                XCTAssertEqual(data?.data, datas[0].data, "\(String(describing: data?.data)) != \(String(describing:datas[0].data))")
                 expA.fulfill()
             case .failure(let error):
                 XCTFail("testDeleteSingleAsync: failed! Error: \(error)")
@@ -183,7 +185,7 @@ final class CacheAsyncTests: XCTestCase {
         cache.load(name: "C", type: CacheData.self, completion: { result in
             switch result {
             case .success(let data):
-                XCTAssertEqual(data?.data, self.data, "\(String(describing: data?.data)) != \(self.data)")
+                XCTAssertEqual(data?.data, datas[2].data, "\(String(describing: data?.data)) != \(String(describing:datas[2].data))")
                 expC.fulfill()
             case .failure(let error):
                 XCTFail("testDeleteSingleAsync: failed! Error: \(error)")
@@ -196,7 +198,7 @@ final class CacheAsyncTests: XCTestCase {
     
     func testDurationAsync() {
         let exp = expectation(description: "Wait cache cleanup")
-        shortCache.persist(cachable: CacheData(name: "Test", data: data), completion: { result in
+        shortCache.persist(cachable: CacheData(name: "Test", data: content.data), completion: { result in
             switch result {
             case .success:
                 DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
@@ -218,11 +220,11 @@ final class CacheAsyncTests: XCTestCase {
     
     func testSizeAsync() {
         let exp = expectation(description: "testSizeAsync")
-        let datas = [CacheData(name: "Test0", data: data),
-                     CacheData(name: "Test1", data: data),
-                     CacheData(name: "Test2", data: data),
-                     CacheData(name: "Test3", data: data),
-                     CacheData(name: "Test4", data: data)]
+        let datas = [CacheData(name: "Test0", data: content.data),
+                     CacheData(name: "Test1", data: content.data),
+                     CacheData(name: "Test2", data: content.data),
+                     CacheData(name: "Test3", data: content.data),
+                     CacheData(name: "Test4", data: content.data)]
         
         shortCache.deleteAll(completion: { _ in
             self.shortCache.persist(cachables: datas, completion: { result in
@@ -258,7 +260,7 @@ final class CacheAsyncTests: XCTestCase {
         shortCache.load(name: "Test1", type: CacheData.self, completion: { result in
             switch result {
             case .success(let data):
-                XCTAssertEqual(data?.data, self.data, "\(String(describing: data?.data)) != \(self.data)")
+                XCTAssertEqual(data?.data, datas[1].data)
                 exp1.fulfill()
             case .failure(let error):
                 XCTFail("testSizeAsync: failed! Error: \(error)")
@@ -269,7 +271,7 @@ final class CacheAsyncTests: XCTestCase {
         shortCache.load(name: "Test2", type: CacheData.self, completion: { result in
             switch result {
             case .success(let data):
-                XCTAssertEqual(data?.data, self.data, "\(String(describing: data?.data)) != \(self.data)")
+                XCTAssertEqual(data?.data, datas[2].data)
                 exp2.fulfill()
             case .failure(let error):
                 XCTFail("testSizeAsync: failed! Error: \(error)")
@@ -280,7 +282,7 @@ final class CacheAsyncTests: XCTestCase {
         shortCache.load(name: "Test3", type: CacheData.self, completion: { result in
             switch result {
             case .success(let data):
-                XCTAssertEqual(data?.data, self.data, "\(String(describing: data?.data)) != \(self.data)")
+                XCTAssertEqual(data?.data, datas[3].data)
                 exp3.fulfill()
             case .failure(let error):
                 XCTFail("testSizeAsync: failed! Error: \(error)")
@@ -291,7 +293,7 @@ final class CacheAsyncTests: XCTestCase {
         shortCache.load(name: "Test4", type: CacheData.self, completion: { result in
             switch result {
             case .success(let data):
-                XCTAssertEqual(data?.data, self.data, "\(String(describing: data?.data)) != \(self.data)")
+                XCTAssertEqual(data?.data, datas[4].data)
                 exp4.fulfill()
             case .failure(let error):
                 XCTFail("testSizeAsync: failed! Error: \(error)")
@@ -305,15 +307,18 @@ final class CacheAsyncTests: XCTestCase {
     func testInfoAsync() {
         let exp = expectation(description: "testInfoAsync")
         let dateBefore = Date()
-        try? cache.persist(cachable: CacheData(name: "TestSize", data: data))
+        let cachable = CacheData(name: "TestSize", data: content.data)
+        try? cache.persist(cachable: cachable)
         cache.info(name: "TestSize", completion: { result in
             switch result {
             case .success(let infos):
                 let dateAfter = Date()
                 
-                XCTAssertEqual(infos.size, 11)
-                XCTAssertTrue(infos.creationDate >= dateBefore && infos.creationDate <= dateAfter, "Date before: \(dateBefore) - Date create: \(infos.creationDate) - Date after: \(dateAfter)")
-                XCTAssertTrue(infos.modifiedDate >= dateBefore && infos.modifiedDate <= dateAfter, "Date before: \(dateBefore) - Date modified: \(infos.modifiedDate) - Date after: \(dateAfter)")
+                XCTAssertEqual(infos.size, cachable.data?.count ?? 0, "Size not equal: \(infos.size) != 11")
+                XCTAssertTrue(infos.creationDate >= dateBefore && infos.creationDate <= dateAfter,
+                              "Date before: \(dateBefore) - Date create: \(infos.creationDate) - Date after: \(dateAfter)")
+                XCTAssertTrue(infos.modifiedDate >= dateBefore && infos.modifiedDate <= dateAfter,
+                              "Date before: \(dateBefore) - Date modified: \(infos.modifiedDate) - Date after: \(dateAfter)")
                 exp.fulfill()
             case .failure(let error):
                 XCTFail("testInfoAsync: failed! Error: \(error)")

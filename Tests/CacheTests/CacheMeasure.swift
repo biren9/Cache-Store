@@ -9,7 +9,7 @@ import XCTest
 @testable import Cache
 
 final class CacheMeasure: XCTestCase {
-    private lazy var disk = DiskSetting(location: .cache, identifier: "json", storeDuration: .minutes(10), maxSize: .MB(10))
+    private lazy var disk = DiskSetting(location: .cache, identifier: "jsonMeasure", storeDuration: .minutes(10), maxSize: .MB(10))
     private lazy var cache = CacheStore(diskSetting: disk)
     private let str = "Hello World"
     private lazy var data: Data = {
