@@ -9,7 +9,7 @@ import Foundation
 
 extension CacheStore {
     
-    typealias Completion = (Result<Void, Error>) -> Void
+    public typealias Completion = (Result<Void, Error>) -> Void
     
     public func cleanup(completion: @escaping Completion) {
         dispatch { [weak self] in
