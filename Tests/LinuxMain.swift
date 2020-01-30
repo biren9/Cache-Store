@@ -1,7 +1,6 @@
+import CacheTests
 import XCTest
 
-@testable import Cache
-
-XCTMain([
-    testCase(CacheTests.allTests)
-])
+var tests = [XCTestCaseEntry]()
+tests += CacheTests.allTests()
+XCTMain(tests)
