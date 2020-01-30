@@ -14,7 +14,7 @@ import UIKit
 public struct CacheImage: Cachable {
     public let name: String
     public let image: UIImage?
-    var data: Data? {
+    public var data: Data? {
         return image?.pngData()
     }
     
@@ -38,10 +38,10 @@ public struct CacheImage: Cachable {
 #if canImport(AppKit)
 import AppKit
 
-struct CacheImage: Cachable {
+public struct CacheImage: Cachable {
     public let name: String
     public let image: NSImage?
-    var data: Data? {
+    public var data: Data? {
         image?.pngData()
     }
     
