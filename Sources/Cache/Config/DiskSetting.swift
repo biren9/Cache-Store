@@ -15,11 +15,12 @@ public struct DiskSetting {
 }
 
 extension DiskSetting {
-    enum Location {
+    public enum Location {
         case cache
         case secureContainer(String)
     }
-    enum Duration {
+    
+    public enum Duration {
         case seconds(Int)
         case minutes(Int)
         case hours(Int)
@@ -39,7 +40,7 @@ extension DiskSetting {
         }
     }
 
-    enum Size {
+    public enum Size {
         case B(Int)
         case KB(Int)
         case MB(Int)
