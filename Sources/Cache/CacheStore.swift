@@ -128,6 +128,8 @@ public class CacheStore {
             return fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first?.appendingPathComponent(diskSetting.identifier)
         case .secureContainer(let securityApplicationGroupIdentifier):
             return fileManager.containerURL(forSecurityApplicationGroupIdentifier: securityApplicationGroupIdentifier)?.appendingPathComponent(diskSetting.identifier)
+        case .custom(let url):
+            return url
         }
     }
 }

@@ -25,6 +25,7 @@ extension DiskSetting {
     public enum Location {
         case cache
         case secureContainer(String)
+        case custom(URL)
     }
     
     public enum Duration {
