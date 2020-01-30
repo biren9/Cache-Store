@@ -5,6 +5,8 @@
 //  Created by Gil Biren on 29/01/2020.
 //
 
+#if !os(Linux)
+
 import XCTest
 @testable import Cache
 
@@ -41,3 +43,5 @@ class CacheImageTests: XCTestCase {
         XCTAssertEqual(image, result?.data)
     }
 }
+
+#endif
