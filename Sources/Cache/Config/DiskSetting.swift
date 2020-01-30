@@ -12,6 +12,13 @@ public struct DiskSetting {
     let identifier: String
     let storeDuration: Duration
     let maxSize: Size
+    
+    public init (location: Location, identifier: String, storeDuration: Duration, maxSize: Size) {
+        self.location = location
+        self.identifier = identifier
+        self.storeDuration = storeDuration
+        self.maxSize = maxSize
+    }
 }
 
 extension DiskSetting {
