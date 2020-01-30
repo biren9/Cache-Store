@@ -8,7 +8,7 @@
 import XCTest
 @testable import Cache
 
-final class CacheAsyncTest: XCTestCase {
+final class CacheAsyncTests: XCTestCase {
     
     private lazy var disk = DiskSetting(location: .cache, identifier: "json", storeDuration: .minutes(10), maxSize: .KB(10))
     private lazy var shortDisk = DiskSetting(location: .cache, identifier: "jsonShort", storeDuration: .seconds(5), maxSize: .B(50))
