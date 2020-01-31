@@ -129,13 +129,15 @@ public class CacheStore {
     }
     
     private func deleteExpiredFiles() throws {
-        let paths = try self.paths() ?? []
-        for name in paths {
-            guard let filePath = locationPath()?.appendingPathComponent(name).relativePath else {
-                throw CacheError.invalidFilePath
-            }
+        let names = try self.paths() ?? []
+        guard let path = locationPath() else {
+            throw CacheError.invalidFilePath
+        }
+        let currentDate = Date()
+        for name in names {
+            let filePath = path.appendingPathComponent(name).relativePath
             guard let date = try fileManager.attributesOfItem(atPath: filePath)[FileAttributeKey.creationDate] as? Date else { continue }
-            if Date().timeIntervalSince(date) > diskSetting.storeDuration.timeInterval() {
+            if currentDate.timeIntervalSince(date) > diskSetting.storeDuration.timeInterval() {
                 try fileManager.removeItem(atPath: filePath)
             }
         }
