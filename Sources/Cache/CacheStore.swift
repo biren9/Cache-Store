@@ -21,17 +21,7 @@ public class CacheStore {
     }
     
     public func cleanup() throws {
-        let paths = try self.paths() ?? []
-        for name in paths {
-            guard let filePath = locationPath()?.appendingPathComponent(name).relativePath else {
-                throw CacheError.invalidFilePath
-            }
-            guard let date = try fileManager.attributesOfItem(atPath: filePath)[FileAttributeKey.creationDate] as? Date else { continue }
-            if Date().timeIntervalSince(date) > diskSetting.storeDuration.timeInterval() {
-                try fileManager.removeItem(atPath: filePath)
-            }
-        }
-        
+        try deleteExpiredFiles()
         if size() > diskSetting.maxSize.byte() {
             let leftPaths = try self.paths() ?? []
             var sorted: [File] = []
@@ -59,13 +49,13 @@ public class CacheStore {
     }
     
     public func delete(name: String) throws {
-        try cleanup()
+        try deleteExpiredFiles()
         guard let path = locationPath() else { throw CacheError.invalidFilePath }
         try fileManager.removeItem(atPath: path.appendingPathComponent(name.toBase64()).relativePath)
     }
     
     public func load<T: Cachable>(name: String, type: T.Type) throws -> T {
-        try cleanup()
+        try deleteExpiredFiles()
         guard let path = locationPath() else { throw CacheError.invalidFilePath }
         let data = fileManager.contents(atPath: path.appendingPathComponent(name.toBase64()).relativePath)
         return T(name: name, data: data)
@@ -84,7 +74,7 @@ public class CacheStore {
     }
     
     public func info(name: String) throws -> FileInformation {
-        try cleanup()
+        try deleteExpiredFiles()
         guard let path = locationPath()?.appendingPathComponent(name.toBase64()).relativePath else { throw CacheError.invalidFilePath }
         let infos = try fileManager.attributesOfItem(atPath: path)
         let size = (infos[FileAttributeKey.size] as? NSNumber)?.intValue ?? -1
@@ -135,6 +125,19 @@ public class CacheStore {
         case .secureContainer(let securityApplicationGroupIdentifier):
             return fileManager.containerURL(forSecurityApplicationGroupIdentifier: securityApplicationGroupIdentifier)?.appendingPathComponent(diskSetting.identifier)
         #endif
+        }
+    }
+    
+    private func deleteExpiredFiles() throws {
+        let paths = try self.paths() ?? []
+        for name in paths {
+            guard let filePath = locationPath()?.appendingPathComponent(name).relativePath else {
+                throw CacheError.invalidFilePath
+            }
+            guard let date = try fileManager.attributesOfItem(atPath: filePath)[FileAttributeKey.creationDate] as? Date else { continue }
+            if Date().timeIntervalSince(date) > diskSetting.storeDuration.timeInterval() {
+                try fileManager.removeItem(atPath: filePath)
+            }
         }
     }
 }
