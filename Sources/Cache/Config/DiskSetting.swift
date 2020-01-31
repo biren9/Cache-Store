@@ -52,12 +52,12 @@ extension DiskSetting {
     }
 
     public enum Size {
-        case B(Int)
-        case KB(Int)
-        case MB(Int)
-        case GB(Int)
+        case B(UInt64)
+        case KB(UInt64)
+        case MB(UInt64)
+        case GB(UInt64)
         
-        func byte() -> Int {
+        func byte() -> UInt64 {
             switch self {
             case .B(let b):
                 return b

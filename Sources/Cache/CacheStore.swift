@@ -102,13 +102,13 @@ public class CacheStore {
         return fileManager.subpaths(atPath: path.relativePath)
     }
     
-    private func size() -> Int {
+    private func size() -> UInt64 {
         guard let paths = try? paths() else { return 0 }
-        var size = 0
+        var size: UInt64 = 0
         for name in paths {
             guard let filePath = locationPath()?.appendingPathComponent(name).relativePath else { continue }
             if let fileSize = try? fileManager.attributesOfItem(atPath: filePath)[FileAttributeKey.size] as? NSNumber {
-                size += fileSize.intValue
+                size += fileSize.uint64Value
             }
         }
         return size
