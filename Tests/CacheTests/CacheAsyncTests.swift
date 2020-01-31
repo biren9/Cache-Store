@@ -33,8 +33,9 @@ final class CacheAsyncTests: XCTestCase {
     
     func testPersistAndLoadAsync() {
         let content = self.content
+        let filename = "Test . / ✊"
         var exp = expectation(description: "testPersistAndLoad")
-        cache.persist(cachable: CacheData(name: "Test", data: content.data), completion: { result in
+        cache.persist(cachable: CacheData(name: filename, data: content.data), completion: { result in
             switch result {
             case .success:
                 exp.fulfill()
@@ -47,7 +48,7 @@ final class CacheAsyncTests: XCTestCase {
         wait(for: [exp], timeout: 1)
         
         exp = expectation(description: "testPersistAndLoad")
-        cache.load(name: "Test", type: CacheData.self, completion: { result in
+        cache.load(name: filename, type: CacheData.self, completion: { result in
             switch result {
             case .success(let dataFromCache):
                 guard let dataFromCache = dataFromCache?.data else {

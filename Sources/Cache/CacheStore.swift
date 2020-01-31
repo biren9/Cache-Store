@@ -61,13 +61,13 @@ public class CacheStore {
     public func delete(name: String) throws {
         try cleanup()
         guard let path = locationPath() else { throw CacheError.invalidFilePath }
-        try fileManager.removeItem(atPath: path.appendingPathComponent(name).relativePath)
+        try fileManager.removeItem(atPath: path.appendingPathComponent(name.toBase64()).relativePath)
     }
     
     public func load<T: Cachable>(name: String, type: T.Type) throws -> T {
         try cleanup()
         guard let path = locationPath() else { throw CacheError.invalidFilePath }
-        let data = fileManager.contents(atPath: path.appendingPathComponent(name).relativePath)
+        let data = fileManager.contents(atPath: path.appendingPathComponent(name.toBase64()).relativePath)
         return T(name: name, data: data)
     }
     
@@ -85,7 +85,7 @@ public class CacheStore {
     
     public func info(name: String) throws -> FileInformation {
         try cleanup()
-        guard let path = locationPath()?.appendingPathComponent(name).relativePath else { throw CacheError.invalidFilePath }
+        guard let path = locationPath()?.appendingPathComponent(name.toBase64()).relativePath else { throw CacheError.invalidFilePath }
         let infos = try fileManager.attributesOfItem(atPath: path)
         let size = (infos[FileAttributeKey.size] as? NSNumber)?.intValue ?? -1
         let creationDate = (infos[FileAttributeKey.creationDate] as? Date) ?? Date(timeIntervalSince1970: 0)
@@ -121,7 +121,7 @@ public class CacheStore {
         
         guard let path = locationPath() else { throw CacheError.invalidFilePath }
         try fileManager.createDirectory(at: path, withIntermediateDirectories: true)
-        fileManager.createFile(atPath: path.appendingPathComponent(cachable.name).relativePath, contents: cachable.data, attributes: [.creationDate: Date()])
+        fileManager.createFile(atPath: path.appendingPathComponent(cachable.name.toBase64()).relativePath, contents: cachable.data, attributes: [.creationDate: Date()])
     }
     
     private func locationPath() -> URL? {
