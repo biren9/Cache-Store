@@ -21,7 +21,7 @@ public class CacheStore {
     }
     
     public func cleanup() throws {
-        try deleteExpiredFiles()
+        deleteExpiredFiles()
         if size() > diskSetting.maxSize.byte() {
             let leftPaths = try self.paths() ?? []
             var sorted: [File] = []
@@ -49,13 +49,13 @@ public class CacheStore {
     }
     
     public func delete(name: String) throws {
-        try deleteExpiredFiles()
+        deleteExpiredFiles()
         guard let path = locationPath() else { throw CacheError.invalidFilePath }
         try fileManager.removeItem(atPath: path.appendingPathComponent(name.toBase64()).relativePath)
     }
     
     public func load<T: Cachable>(name: String, type: T.Type) throws -> T {
-        try deleteExpiredFiles()
+        deleteExpiredFiles()
         guard let path = locationPath() else { throw CacheError.invalidFilePath }
         let data = fileManager.contents(atPath: path.appendingPathComponent(name.toBase64()).relativePath)
         return T(name: name, data: data)
@@ -74,7 +74,7 @@ public class CacheStore {
     }
     
     public func info(name: String) throws -> FileInformation {
-        try deleteExpiredFiles()
+        deleteExpiredFiles()
         guard let path = locationPath()?.appendingPathComponent(name.toBase64()).relativePath else { throw CacheError.invalidFilePath }
         let infos = try fileManager.attributesOfItem(atPath: path)
         let size = (infos[FileAttributeKey.size] as? NSNumber)?.intValue ?? -1
@@ -128,18 +128,22 @@ public class CacheStore {
         }
     }
     
-    private func deleteExpiredFiles() throws {
-        let names = try self.paths() ?? []
-        guard let path = locationPath() else {
-            throw CacheError.invalidFilePath
-        }
-        let currentDate = Date()
-        for name in names {
-            let filePath = path.appendingPathComponent(name).relativePath
-            guard let date = try fileManager.attributesOfItem(atPath: filePath)[FileAttributeKey.creationDate] as? Date else { continue }
-            if currentDate.timeIntervalSince(date) > diskSetting.storeDuration.timeInterval() {
-                try fileManager.removeItem(atPath: filePath)
+    private func deleteExpiredFiles() {
+        DispatchQueue.global(qos: .utility).async {
+            do {
+            let names = try self.paths() ?? []
+                guard let path = self.locationPath() else {
+                throw CacheError.invalidFilePath
             }
+            let currentDate = Date()
+            for name in names {
+                let filePath = path.appendingPathComponent(name).relativePath
+                guard let date = try self.fileManager.attributesOfItem(atPath: filePath)[FileAttributeKey.creationDate] as? Date else { continue }
+                if currentDate.timeIntervalSince(date) > self.diskSetting.storeDuration.timeInterval() {
+                    try self.fileManager.removeItem(atPath: filePath)
+                }
+            }
+            } catch {}
         }
     }
 }
