@@ -44,8 +44,23 @@ final class CacheMeasure: XCTestCase {
         }
     }
     
+    func testMeasureRead() {
+        var datas: [Cachable] = []
+        for i in 0..<10 {
+            datas.append(CacheData(name: "Test\(i)", data: CacheImageTests.properImageData()))
+        }
+        try? cache.persist(cachables: datas)
+        
+        measure {
+            for i in 0..<10 {
+                _ = try? cache.load(name: "Test\(i)", type: CacheImage.self)
+            }
+        }
+    }
+    
     static var allTests = [
         ("testMeasureSingle", testMeasureSingle),
-        ("testMeasureBatch", testMeasureBatch)
+        ("testMeasureBatch", testMeasureBatch),
+        ("testMeasureRead", testMeasureRead)
     ]
 }

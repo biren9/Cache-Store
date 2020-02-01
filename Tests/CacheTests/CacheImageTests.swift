@@ -13,9 +13,9 @@ import XCTest
 class CacheImageTests: XCTestCase {
     private lazy var disk = DiskSetting(location: .cache, identifier: "images", storeDuration: .minutes(10), maxSize: .MB(10))
     private lazy var cache = CacheStore(diskSetting: disk)
-    private let url = URL(string: "https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png")!
+    private static let url = URL(string: "https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png")!
     
-    private func properImageData() -> Data? {
+    static func properImageData() -> Data? {
         #if canImport(AppKit)
         guard let imageData = try? Data(contentsOf: url), let image = NSImage(data: imageData)?.pngData() else {
             return nil
@@ -32,7 +32,7 @@ class CacheImageTests: XCTestCase {
     }
     
     func testImage() {
-        guard let image = properImageData() else {
+        guard let image = Self.properImageData() else {
             XCTFail("Download failed")
             return
         }
