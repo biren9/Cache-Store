@@ -19,6 +19,7 @@ public class CacheStore {
         self.diskSetting = diskSetting
         self.fileManager = fileManager
         self.asyncQueue = asyncQueue
+        deleteExpiredFilesIfNeeded()
     }
     
     public func cleanup() throws {
