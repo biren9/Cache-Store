@@ -30,8 +30,8 @@ public protocol Cachable {
 Every cachable object can be saved. It is important that the information to be stored is all located in the Data property.
 Currently, there are already models that comply with the protocol to transfer Data or UIImage / NSImage.
 
-[x] CacheData: Data
-[x] CacheImage: UIImage / NSImage
+- [x] CacheData: Data
+- [x] CacheImage: UIImage / NSImage
 
 ### CacheStore
 The cache store has for every call a sync and an async api.
