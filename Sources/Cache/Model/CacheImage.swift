@@ -35,7 +35,7 @@ public struct CacheImage: Cachable {
 
 #endif
 
-#if canImport(AppKit)
+#if targetEnvironment(macOS)
 import AppKit
 
 public struct CacheImage: Cachable {

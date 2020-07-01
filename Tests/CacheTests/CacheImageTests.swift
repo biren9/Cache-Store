@@ -16,7 +16,7 @@ class CacheImageTests: XCTestCase {
     private static let url = URL(string: "https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png")!
     
     static func properImageData() -> Data? {
-        #if canImport(AppKit)
+        #if canImport(AppKit) && !targetEnvironment(macCatalyst)
         guard let imageData = try? Data(contentsOf: url), let image = NSImage(data: imageData)?.pngData() else {
             return nil
         }
