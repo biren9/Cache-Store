@@ -1,4 +1,4 @@
-# Cache-Store [![Build Status](https://travis-ci.org/biren9/Cache-Store.svg?branch=master)](https://travis-ci.org/biren9/Cache-Store) ![Swift Version](https://img.shields.io/badge/Swift-5.1-blue)
+# Cache-Store [![Build Status](https://travis-ci.org/biren9/Cache-Store.svg?branch=master)](https://travis-ci.org/biren9/Cache-Store) ![Swift Version](https://img.shields.io/badge/Swift-5.3-blue)
 
 ## Description
 Cache-Store is a lightweight caching package to cache any data object locally. You can create multiple so called rate disks, which have a maximum lifetime and size. If this is exceeded, the oldest files are automatically deleted.
