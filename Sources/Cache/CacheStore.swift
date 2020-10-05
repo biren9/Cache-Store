@@ -131,9 +131,11 @@ public class CacheStore {
     }
     
     private func deleteExpiredFilesIfNeeded() {
-        if self.nextCleanupExpiredFileNeeded > Date() {
+        guard let timeInterval = self.diskSetting.storeDuration.timeInterval(),
+              self.nextCleanupExpiredFileNeeded <= Date() else {
             return // Nothing to clean
         }
+        
         DispatchQueue.global(qos: .utility).async { [weak self] in
             guard let self = self else { return }
             do {
@@ -147,13 +149,13 @@ public class CacheStore {
                 for name in names {
                     let filePath = path.appendingPathComponent(name).relativePath
                     guard let date = try self.fileManager.attributesOfItem(atPath: filePath)[FileAttributeKey.creationDate] as? Date else { continue }
-                    if currentDate.timeIntervalSince(date) > self.diskSetting.storeDuration.timeInterval() {
+                    if currentDate.timeIntervalSince(date) > timeInterval {
                         try self.fileManager.removeItem(atPath: filePath)
                     } else if oldestFileDate > date {
                         oldestFileDate = date
                     }
                 }
-                self.nextCleanupExpiredFileNeeded = oldestFileDate.addingTimeInterval(self.diskSetting.storeDuration.timeInterval())
+                self.nextCleanupExpiredFileNeeded = oldestFileDate.addingTimeInterval(timeInterval)
             } catch { }
         }
     }

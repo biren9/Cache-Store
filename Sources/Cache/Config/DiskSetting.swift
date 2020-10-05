@@ -36,8 +36,9 @@ extension DiskSetting {
         case minutes(Int)
         case hours(Int)
         case days(Int)
+        case infinity
         
-        func timeInterval() -> TimeInterval {
+        func timeInterval() -> TimeInterval? {
             switch self {
             case .seconds(let seconds):
                 return TimeInterval(exactly: seconds)!
@@ -47,6 +48,8 @@ extension DiskSetting {
                 return TimeInterval(exactly: hours*60*60)!
             case .days(let days):
                 return TimeInterval(exactly: days*60*60*24)!
+            case .infinity:
+                return nil
             }
         }
     }
