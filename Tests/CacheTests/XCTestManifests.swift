@@ -16,7 +16,8 @@ public func allTests() -> [XCTestCaseEntry] {
     return [
         testCase(CacheAsyncTests.allTests),
         testCase(CacheMeasure.allTests),
-        testCase(CacheTests.allTests)
+        testCase(CacheTests.allTests),
+        testCase(CacheWrapperTests.allTests)
     ]
 }
 #endif
