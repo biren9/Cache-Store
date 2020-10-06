@@ -87,6 +87,24 @@ public class CacheStore {
                                modifiedDate: modifiedDate)
     }
     
+    public func avaiableFiles(contains part: String? = nil) throws -> [String] {
+        deleteExpiredFilesIfNeeded()
+        guard let path = locationPath() else { throw CacheError.invalidFilePath }
+        guard let directoryContent = try? fileManager.contentsOfDirectory(atPath: path.relativePath) else { return [] }
+        let allPaths = directoryContent.map { $0.fromBase64() }.compactMap { $0 }
+        guard let part = part else {
+            return allPaths
+        }
+        return allPaths.filter { $0.contains(part) }
+    }
+    
+    public func fileExists(with name: String) throws -> Bool {
+        deleteExpiredFilesIfNeeded()
+        guard let path = locationPath() else { throw CacheError.invalidFilePath }
+        let fullPath = path.appendingPathComponent(name.toBase64()).relativePath
+        return fileManager.fileExists(atPath: fullPath)
+    }
+    
     // MARK: Private 
     
     private func paths() throws -> [String]? {

@@ -95,6 +95,30 @@ extension CacheStore {
         }
     }
     
+    public func avaiableFiles(contains part: String? = nil, completion: @escaping (Result<[String], Error>) -> Void) {
+        dispatch { [weak self] in
+            guard let self = self else { return }
+            do {
+                let avaiableFiles = try self.avaiableFiles(contains: part)
+                completion(.success(avaiableFiles))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    public func fileExists(with name: String, completion: @escaping (Result<Bool, Error>) -> Void) {
+        dispatch { [weak self] in
+            guard let self = self else { return }
+            do {
+                let fileExists = try self.fileExists(with: name)
+                completion(.success(fileExists))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+    
     // MARK: Private
     
     private func dispatch(_ block: @escaping () -> Void) {

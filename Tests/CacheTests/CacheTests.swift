@@ -130,6 +130,38 @@ final class CacheTests: XCTestCase {
         XCTAssertTrue(infos!.modifiedDate >= dateBefore && infos!.modifiedDate <= dateAfter)
     }
     
+    func testFileExists() {
+        let existsBefore = try? cache.fileExists(with: "A")
+        XCTAssertFalse(existsBefore!, "Should not exist at this time")
+        try? cache.persist(cachable: CacheData(name: "A", data: data))
+        let existsAfter = try? cache.fileExists(with: "A")
+        XCTAssertTrue(existsAfter!, "Should exist at this time")
+        try? cache.delete(name: "A")
+        let existsAfterDelete = try? cache.fileExists(with: "A")
+        XCTAssertFalse(existsAfterDelete!, "Should not exist at this time")
+    }
+    
+    func testAvailableFiles() {
+        let search = "est-"
+        
+        let countBeforeAll = try? cache.avaiableFiles().count
+        let countBeforeContains = try? cache.avaiableFiles(contains: search).count
+        XCTAssertEqual(countBeforeAll, 0, "Found unexpected file")
+        XCTAssertEqual(countBeforeContains, 0, "Found unexpected file")
+        
+        try? cache.persist(cachable: CacheData(name: "Test-123", data: data))
+        try? cache.persist(cachable: CacheData(name: "est-123", data: data))
+        try? cache.persist(cachable: CacheData(name: "Test", data: data))
+        try? cache.persist(cachable: CacheData(name: "--123", data: data))
+        try? cache.persist(cachable: CacheData(name: "TeSt-123", data: data))
+        try? cache.persist(cachable: CacheData(name: "-", data: data))
+        
+        let countAfterAll = try? cache.avaiableFiles().count
+        let countAfterContains = try? cache.avaiableFiles(contains: search).count
+        XCTAssertEqual(countAfterAll, 6, "Found unexpected file")
+        XCTAssertEqual(countAfterContains, 2, "Found unexpected file")
+    }
+    
     static var allTests = [
         ("testInfo", testInfo),
         ("testSize", testSize),
@@ -137,6 +169,8 @@ final class CacheTests: XCTestCase {
         ("testDeleteSingle", testDeleteSingle),
         ("testDeleteAll", testDeleteAll),
         ("testPersistMultiple", testPersistMultiple),
-        ("testPersistAndLoad", testPersistAndLoad)
+        ("testPersistAndLoad", testPersistAndLoad),
+        ("testFileExists", testFileExists),
+        ("testAvailableFiles", testAvailableFiles)
     ]
 }

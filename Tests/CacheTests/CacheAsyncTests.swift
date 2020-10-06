@@ -331,6 +331,108 @@ final class CacheAsyncTests: XCTestCase {
         wait(for: [exp], timeout: 2)
     }
     
+    
+    func testFileExistsAsync() {
+        var exp = expectation(description: "testInfoAsync")
+        let cachable = CacheData(name: "TestSize", data: content.data)
+        
+        cache.fileExists(with: cachable.name, completion: { result in
+            switch result {
+            case .success(let hasFound):
+                XCTAssertFalse(hasFound, "Should not exist at this time")
+                exp.fulfill()
+            case .failure(let error):
+                XCTFail("testFileExistsAsync: failed! Error: \(error)")
+            }
+        })
+        
+        wait(for: [exp], timeout: 2)
+        exp = expectation(description: "testInfoAsync")
+        try? cache.persist(cachable: cachable)
+        
+        cache.fileExists(with: cachable.name, completion: { result in
+            switch result {
+            case .success(let hasFound):
+                XCTAssertTrue(hasFound, "Should exist at this time")
+                exp.fulfill()
+            case .failure(let error):
+                XCTFail("testFileExistsAsync: failed! Error: \(error)")
+            }
+        })
+        
+        wait(for: [exp], timeout: 2)
+        exp = expectation(description: "testInfoAsync")
+        try? cache.delete(name: cachable.name)
+        
+        cache.fileExists(with: cachable.name, completion: { result in
+            switch result {
+            case .success(let hasFound):
+                XCTAssertFalse(hasFound, "Should not exist at this time")
+                exp.fulfill()
+            case .failure(let error):
+                XCTFail("testFileExistsAsync: failed! Error: \(error)")
+            }
+        })
+        wait(for: [exp], timeout: 2)
+    }
+    
+    func testAvailableFilesAsync() {
+        var exp = expectation(description: "testInfoAsync")
+        exp.expectedFulfillmentCount = 2
+        let search = "est-"
+        
+        cache.avaiableFiles { result in
+            switch result {
+            case .success(let names):
+                XCTAssertEqual(names.count, 0, "Found unexpected file")
+                exp.fulfill()
+            case .failure(let error):
+                XCTFail("testFileExistsAsync: failed! Error: \(error)")
+            }
+        }
+        cache.avaiableFiles(contains: search) { result in
+            switch result {
+            case .success(let names):
+                XCTAssertEqual(names.count, 0, "Found unexpected file")
+                exp.fulfill()
+            case .failure(let error):
+                XCTFail("testFileExistsAsync: failed! Error: \(error)")
+            }
+        }
+        
+        wait(for: [exp], timeout: 2)
+        exp = expectation(description: "testInfoAsync")
+        exp.expectedFulfillmentCount = 2
+        
+        try? cache.persist(cachable: CacheData(name: "Test-123", data: content.data))
+        try? cache.persist(cachable: CacheData(name: "est-123", data: content.data))
+        try? cache.persist(cachable: CacheData(name: "Test", data: content.data))
+        try? cache.persist(cachable: CacheData(name: "--123", data: content.data))
+        try? cache.persist(cachable: CacheData(name: "TeSt-123", data: content.data))
+        try? cache.persist(cachable: CacheData(name: "-", data: content.data))
+        
+        cache.avaiableFiles { result in
+            switch result {
+            case .success(let names):
+                XCTAssertEqual(names.count, 6, "Found unexpected file")
+                exp.fulfill()
+            case .failure(let error):
+                XCTFail("testFileExistsAsync: failed! Error: \(error)")
+            }
+        }
+        cache.avaiableFiles(contains: search) { result in
+            switch result {
+            case .success(let names):
+                XCTAssertEqual(names.count, 2, "Found unexpected file")
+                exp.fulfill()
+            case .failure(let error):
+                XCTFail("testFileExistsAsync: failed! Error: \(error)")
+            }
+        }
+        
+        wait(for: [exp], timeout: 2)
+    }
+    
     static var allTests = [
         ("testInfoAsync", testInfoAsync),
         ("testSizeAsync", testSizeAsync),
@@ -338,6 +440,8 @@ final class CacheAsyncTests: XCTestCase {
         ("testDeleteSingleAsync", testDeleteSingleAsync),
         ("testDeleteAllAsync", testDeleteAllAsync),
         ("testPersistMultipleAsync", testPersistMultipleAsync),
-        ("testPersistAndLoadAsync", testPersistAndLoadAsync)
+        ("testPersistAndLoadAsync", testPersistAndLoadAsync),
+        ("testFileExistsAsync", testFileExistsAsync),
+        ("testAvailableFilesAsync", testAvailableFilesAsync)
     ]
 }
