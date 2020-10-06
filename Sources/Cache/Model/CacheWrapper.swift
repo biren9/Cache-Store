@@ -9,22 +9,24 @@ import Foundation
 
 public struct CacheWrapper<T: Codable>: Cachable {
     public let name: String
-    public let data: Data?
-    
-    public init(name: String, data: Data?) {
-        self.name = name
-        self.data = data
+    public let value: T?
+    public var data: Data? {
+        let encoder = JSONEncoder()
+        return try? encoder.encode(value)
     }
     
     public init(name: String, value: T) {
-        let encoder = JSONEncoder()
         self.name = name
-        self.data = try? encoder.encode(value)
+        self.value = value
     }
- 
-    public func value() -> T? {
-        guard let data = data else { return nil }
-        let decoder = JSONDecoder()
-        return try? decoder.decode(T.self, from: data)
+    
+    public init(name: String, data: Data?) {
+        self.name = name
+        if let data = data {
+            let decoder = JSONDecoder()
+            value = try? decoder.decode(T.self, from: data)
+        } else {
+            value = nil
+        }
     }
 }

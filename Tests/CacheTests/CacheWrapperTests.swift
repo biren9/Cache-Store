@@ -32,7 +32,7 @@ final class CacheWrapperTests: XCTestCase {
         let startUpObject = TestObject(string: "test_string 123", int: 989, float: 3.17, array: [0,2,3])
         
         try? cache.persist(cachable: CacheWrapper(name: "TEST", value: startUpObject))
-        guard let loadedObject = (try? cache.load(name: "TEST", type: CacheWrapper<TestObject>.self))?.value() else {
+        guard let loadedObject = (try? cache.load(name: "TEST", type: CacheWrapper<TestObject>.self))?.value else {
             XCTFail()
             return
         }
