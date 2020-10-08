@@ -15,7 +15,7 @@ public class CacheStore {
     
     private typealias File = (date: Date, size: Int, filePath: String)
     
-    public init(diskSetting: DiskSetting, fileManager: FileManager = FileManager.default, asyncQueue: DispatchQueue = .global(qos: .utility)) {
+    public init(diskSetting: DiskSetting, fileManager: FileManager = .default, asyncQueue: DispatchQueue = .global(qos: .utility)) {
         self.diskSetting = diskSetting
         self.fileManager = fileManager
         self.asyncQueue = asyncQueue
@@ -82,9 +82,11 @@ public class CacheStore {
         let size = (infos[FileAttributeKey.size] as? NSNumber)?.intValue ?? -1
         let creationDate = (infos[FileAttributeKey.creationDate] as? Date) ?? Date(timeIntervalSince1970: 0)
         let modifiedDate = (infos[FileAttributeKey.modificationDate] as? Date) ?? Date(timeIntervalSince1970: 0)
-        return FileInformation(size: size,
-                               creationDate: creationDate,
-                               modifiedDate: modifiedDate)
+        return FileInformation(
+            size: size,
+            creationDate: creationDate,
+            modifiedDate: modifiedDate
+         )
     }
     
     public func avaiableFiles(contains part: String? = nil) throws -> [String] {
